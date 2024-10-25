@@ -40,6 +40,7 @@ const Tasks = DB.tasks = require("./tasks.model.js").Model(initialInstance, crea
 const Courseregister = DB.courseregister = require("./courseregister.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
 const Studenttasks = DB.studenttasks = require("./studenttasks.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
 const Group = DB.group = require("./group.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
+const Announcement = DB.announcement = require("./announcement.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
 
 
 
@@ -51,7 +52,8 @@ module.exports = {
     Tasks,
     Courseregister,
     Studenttasks,
-    Group
+    Group,
+    Announcement
     
     
 };

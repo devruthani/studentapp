@@ -30,24 +30,22 @@ const { DB } = require("./src/model");
 
 // auth routes 
 const authRoutes = require("./src/routes/authRoutes");
-app.use(authRoutes);
-
 // course routes 
 const courseRoutes = require("./src/routes/courseRoutes")
-app.use(courseRoutes);
-
-
 // group routes 
 const groupRoutes = require("./src/routes/groupRoutes")
-app.use(groupRoutes);
-
-const adminRoutes = require("./src/routes/adminRoutes");
 const tasksRoutes = require("./src/routes/tasksRoutes")
 const studentTaskRoutes = require("./src/routes/studentstaskRoutes");
 
-app.use(adminRoutes)
+
+app.use(authRoutes);
 app.use(tasksRoutes)
 app.use(studentTaskRoutes);
+app.use(groupRoutes);
+app.use(courseRoutes);
+
+
+
 
 // app.get("/",async(req,res)=>{
 //     res.send("hello student")

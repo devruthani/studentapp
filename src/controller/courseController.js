@@ -1,11 +1,10 @@
 
 const db = require("../../dbconnection/dbconfig");
 const crypto = require("crypto");
-const { encrypt } = require("../utils/encrypt");
-const randomOtp = require("random-otp-generator");
-const { sendMail } = require("../utils/nodemailer");
-const Cache = require("memory-cache");
-const jwt = require("jsonwebtoken");
+const { Courses } = require("../model");
+const { Model } = require("../model/courses.model");
+
+
 
 const courseController ={
   
@@ -14,7 +13,7 @@ async createCourse(req,res){
     try{
         const courseId = crypto.randomBytes(16).toString("hex");
 
-        const courses = await db.create("courses",{
+        const courses = await Courses.create("courses",{
             courseid: courseId,
             title:req.body.title,
             description:req.body.description,
@@ -30,7 +29,7 @@ async createCourse(req,res){
             })
             
         }else{
-            return res.status(400).json({
+            return res.status(404).json({
                 error:true,
                 message:"Failed to create course",
                 
@@ -40,7 +39,7 @@ async createCourse(req,res){
 
     }catch(error){
         console.log(error);
-        return  res.status(400).json({
+        return  res.status(500).json({
             error:true,
             message: "Oops! some thing went wrong"
             })
@@ -48,31 +47,67 @@ async createCourse(req,res){
     }
 },
 
+/* ----------------------------- get all courses ---------------------------- */
+async fetchCourses(req,res){
+    try{
+
+    
+    const fetchAllcourses = await Courses.findAll();
+    if(fetchAllcourses){
+        return res.status(200).json({
+        error:false,
+        message:"Courses acquired successfully",
+        data:fetchAllcourses
+        })
+    }else{
+        return res.status(404).json({
+            error:true,
+            message:"Failed to fetch courses"
+        })
+
+    }
+}catch(error){
+    console.log(error)
+    return res.status(500).json({
+        error:true,
+        message:"Error fetching courses",
+        data:error.message
+    })
+
+}
+
+},
+
 /* ----------------------------- GET GROUP BY ID ---------------------------- */
+
+
 
 async fetchByid(req,res){
     try {
         
-   
-    const getByid = await db.select("courses",{courseid:req.params.courseid});
-    if(getByid){
+   const {courseid} = req.params;
+    const getByid = await Courses.findOne({where:{courseid}});
+    if(!getByid){
+        return res.status(404).json({
+            error:true,
+            message:"Failed to acquire course information"
+        })
+      
+
+    }else{
         return res.status(200).json({
             error:false,
             message:"Course information acquired successfully",
             data:getByid
         })
-
-    }else{
-        return res.status(400).json({
-            error:true,
-            message:"Failed to acquire course information"
-        })
+       
     }
 } catch (error) {
 console.log(error);
-return  res.status(400).json({
+return  res.status(500).json({
     error:true,
-    message: "Oops! some thing went wrong"
+    message: "Oops! some thing went wrong",
+    data:error.message
     })
         
 }
@@ -114,6 +149,33 @@ async editCourse(req,res){
 },
 
 /* ------------------------------ DELETE COURSE ----------------------------- */
+async delete(req,res){
+    try{
+        const {courseid } = req.body;
+        const delCoursereg = await Courseregister.findOne({where: {courseid}});
+
+        if(!delCoursereg){
+            return res.status(404).json({ error:true,message: "Course register not found" });
+
+        }else{
+            await Courseregister.destroy();
+            res.status(200).json({ 
+                error:false,
+                message: "course register deleted successfully" });
+
+
+        }
+
+    }catch(error){
+        console.log(error)
+        return res.status(500).json({
+            error:true,
+            message:"Error deleting course register",
+            data:error.message
+        });
+
+    }
+}
 
 
 
