@@ -1,0 +1,129 @@
+{
+    "info": {
+      "name": "Tasks API Collection",
+      "_postman_id": "abcdef12-3456-7890-abcd-ef1234567890",
+      "description": "Collection of API requests for CRUD operations on Tasks",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Create Task",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"taskid\": \"task1\",\n    \"courseid\": \"course1\",\n    \"taskname\": \"Sample Task\",\n    \"description\": \"This is a sample task description\",\n    \"instructions\": \"Complete all the questions\",\n    \"week\": \"Week 1\",\n    \"status\": \"Pending\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:2550/tasks",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "2550",
+            "path": [
+              "tasks"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Get All Tasks",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:2550/tasks",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "2550",
+            "path": [
+              "tasks"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Get Task By ID",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:2550/tasks/task1",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "2550",
+            "path": [
+              "tasks",
+              "task1"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Update Task",
+        "request": {
+          "method": "PUT",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"taskname\": \"Updated Task Name\",\n    \"description\": \"Updated task description\",\n    \"status\": \"Completed\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:2550/tasks/task1",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "2550",
+            "path": [
+              "tasks",
+              "task1"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Delete Task",
+        "request": {
+          "method": "DELETE",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:2550/tasks/task1",
+            "protocol": "http",
+            "host": [
+              "localhost"
+            ],
+            "port": "2550",
+            "path": [
+              "tasks",
+              "task1"
+            ]
+          }
+        },
+        "response": []
+      }
+    ]
+  }
+  
