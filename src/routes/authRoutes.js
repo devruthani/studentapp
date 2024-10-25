@@ -11,4 +11,8 @@ router.post("/api/auth/verifyotp",authController.verifyOTP);
 router.post("/api/auth/resetpassword",authController.resetPassword);
 
 
+/* --------------------------- user profile route --------------------------- */
+router.get("/api/user/getbyid/:userid",authController.getUserbyid);
+
+
 module.exports = router;

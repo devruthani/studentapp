@@ -63,11 +63,11 @@ const authController = {
         });
       }
     } catch (error) {
-      console.log(err);
-      return res.status(400).json({
-        error: true,
-        message: "Oops! some thing went wrong",
-      });
+      console.log(error);
+      // return res.status(400).json({
+      //   error: true,
+      //   message: "Oops! some thing went wrong",
+      // });
     }
   },
 
@@ -94,7 +94,7 @@ const authController = {
         });
       }
     } catch (error) {
-      console.log(err);
+      console.log(error);
       return res.status(400).json({
         error: true,
         message: "Oops! some thing went wrong",
@@ -301,9 +301,42 @@ async verifyOTP(req, res) {
         message: "Failed to reset password"
       });
     }
-  }
-  
+  },
 
+
+  /* -------------------------- GET USERS INFORMATION ------------------------- */
+
+  
+async getUserbyid(req,res){
+  try{
+    const userProfile = await db.select("auths",{userid:req.params.userid});
+    console.log(userProfile)
+
+    if(userProfile){
+      return res.status(200).json({
+        error:false,
+        message:"User information acquired successfully",
+        data:userProfile
+      })
+     
+     
+    }else{
+      return res.status(400).json({
+        error:true,
+        message:"Failed to acquire user information",
+        
+      })
+    }
+
+  }catch(error){
+    console.log(error).toString();
+    return res.status(400).json({
+      error:false,
+      message:"Something went wrong"
+    })
+
+  }
+}
 
 
 

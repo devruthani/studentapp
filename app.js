@@ -1,7 +1,6 @@
 
 const express = require("express");
 const cors = require('cors');
-const db = require("./dbconnection/dbconfig");
 const app = express();
 
 app.use(express.json());
@@ -28,8 +27,20 @@ const { DB } = require("./src/model");
 
 
 // import routes 
-const adminRoutes = require("./src/routes/adminRoutes");
-app.use(adminRoutes)
+
+// auth routes 
+const authRoutes = require("./src/routes/authRoutes");
+app.use(authRoutes);
+
+// course routes 
+const courseRoutes = require("./src/routes/courseRoutes")
+app.use(courseRoutes);
+
+
+// group routes 
+const groupRoutes = require("./src/routes/groupRoutes")
+app.use(groupRoutes);
+
 
 // app.get("/",async(req,res)=>{
 //     res.send("hello student")
