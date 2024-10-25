@@ -29,8 +29,9 @@ const { DB } = require("./src/model");
 
 // import routes 
 const adminRoutes = require("./src/routes/adminRoutes");
+const tasksRoutes = require("./src/routes/tasksRoutes")
 app.use(adminRoutes)
-
+app.use(tasksRoutes)
 // app.get("/",async(req,res)=>{
 //     res.send("hello student")
 // })
