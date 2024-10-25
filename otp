@@ -1,0 +1,284 @@
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const mysql = require('mysql2/promise');
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// JWT Secret Key
+const JWT_SECRET = 'your_jwt_secret_key'; // Store this securely (e.g., in environment variables)
+
+// Create a MySQL connection pool
+const db = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: 'password',
+  database: 'your_database_name',
+});
+
+// Function to generate random OTP
+const randomOtp = (length) => {
+  return Math.floor(100000 + Math.random() * 900000).toString().substring(0, length);
+};
+
+// Function to send email (using nodemailer)
+const sendMail = async (to, subject, body) => {
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'your-email@gmail.com',
+      pass: 'your-email-password',
+    },
+  });
+
+  let mailOptions = {
+    from: 'your-email@gmail.com',
+    to,
+    subject,
+    html: body,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+/* ----------------------------- Forgot Password ----------------------------- */
+app.post('/api/admin/forgotpassword', async (req, res) => {
+  const checkemail = req.body.email;
+
+  if (!checkemail) {
+    return res.json({ success: false, message: "No email was sent" });
+  }else{
+
+ 
+
+  const otp = randomOtp(6);
+
+  // Create a JWT token containing the OTP and email, with a 5-minute expiration time
+  const token = jwt.sign({ otp, email: checkemail }, JWT_SECRET, { expiresIn: '5m' });
+
+  // Send the token in the email (user will use this token in the verification process)
+  await sendMail(checkemail, 'OTP Verification Code', `<h1>Your OTP verification code is ${otp}</h1>`);
+
+  res.json({ success: true, message: "An OTP has been sent to your email", token });
+}
+});
+
+/* ----------------------------- Resend OTP ----------------------------- */
+app.post('/api/admin/resendotp', async (req, res) => {
+  const checkemail = req.body.email;
+
+  if (!checkemail) {
+    return res.json({ success: false, message: "No email was provided" });
+  }
+
+  const otp = randomOtp(6);
+
+  // Create a new JWT token with a fresh OTP and a 5-minute expiration time
+  const token = jwt.sign({ otp, email: checkemail }, JWT_SECRET, { expiresIn: '5m' });
+
+  // Send the new token and OTP via email
+  await sendMail(checkemail, 'OTP Verification Code', `<h1>Your OTP verification code is ${otp}</h1>`);
+
+  res.json({ success: true, message: "An OTP has been resent to your email", token });
+});
+
+/* ----------------------------- Verify OTP ----------------------------- */
+app.post('/api/user/verifyotp', async (req, res) => {
+  const { token, verifyotp } = req.body;
+
+  if (!token || !verifyotp) {
+    return res.json({ success: false, message: "OTP or token is missing" });
+  }
+
+  try {
+    // Verify and decode the JWT token
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    if (decoded.otp === verifyotp) {
+      return res.json({ success: true, message: "OTP Verified successfully" });
+    } else {
+      return res.json({ success: false, message: "The OTP you provided is incorrect" });
+    }
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.json({ success: false, message: "The OTP has expired" });
+    }
+    return res.json({ success: false, message: "Invalid token" });
+  }
+});
+
+/* ----------------------------- Reset Password ----------------------------- */
+app.post('/api/user/resetpassword', async (req, res) => {
+  const newpassword = req.body.password;
+  const confirmpassword = req.body.confirmpassword;
+  const checkemail = req.body.email;
+
+  if (newpassword !== confirmpassword) {
+    return res.json({ success: false, message: "Passwords do not match!" });
+  }
+
+  try {
+    // Find user by email
+    const [user] = await db.query(`SELECT * FROM users WHERE email = ?`, [checkemail]);
+
+    if (user.length > 0) {
+      // Encrypt the new password (replace with your encryption method)
+      const encryptedPassword = cryptr.encrypt(newpassword);
+      
+      // Update the password in the database
+      await db.query(`UPDATE users SET password = ? WHERE email = ?`, [encryptedPassword, checkemail]);
+
+      res.json({ success: true, message: "Password reset successfully" });
+    } else {
+      res.json({ success: false, message: "User with this email does not exist" });
+    }
+  } catch (error) {
+    console.error('Password reset failed:', error);
+    res.json({ success: false, message: "Failed to reset password" });
+  }
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on http://localhost:3000');
+});
+
+
+
+// using cache 
+
+
+const express = require('express');
+const NodeCache = require('node-cache');
+const nodemailer = require('nodemailer');
+const mysql = require('mysql2/promise');
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Initialize NodeCache with a TTL (Time-To-Live) of 5 minutes for OTPs
+const otpCache = new NodeCache({ stdTTL: 300 });
+
+// Create a MySQL connection pool
+const db = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: 'password',
+  database: 'your_database_name',
+});
+
+// Function to generate random OTP
+const randomOtp = (length) => {
+  return Math.floor(100000 + Math.random() * 900000).toString().substring(0, length);
+};
+
+// Function to send email (using nodemailer)
+const sendMail = async (to, subject, body) => {
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'your-email@gmail.com',
+      pass: 'your-email-password',
+    },
+  });
+
+  let mailOptions = {
+    from: 'your-email@gmail.com',
+    to,
+    subject,
+    html: body,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+/* ----------------------------- Forgot Password ----------------------------- */
+app.post('/api/admin/forgotpassword', async (req, res) => {
+  const checkemail = req.body.email;
+
+  if (!checkemail) {
+    return res.json({ success: false, message: "No email was sent" });
+  }
+
+  const otp = randomOtp(6);
+  otpCache.set(checkemail, otp);  // Store OTP in memory cache for 5 minutes
+  await sendMail(checkemail, 'OTP Verification Code', `<h1>Your OTP verification code is ${otp}</h1>`);
+
+  res.json({ success: true, message: "An OTP has been sent to your email" });
+});
+
+/* ----------------------------- Resend OTP ----------------------------- */
+app.get('/api/admin/resendotp', async (req, res) => {
+  const checkemail = req.body.email;
+
+  if (!checkemail) {
+    return res.json({ success: false, message: "No email was provided" });
+  }
+
+  const existingOtp = otpCache.get(checkemail);
+
+  if (!existingOtp) {
+    return res.json({ success: false, message: "User with this email has not requested an OTP yet" });
+  }
+
+  const otp = randomOtp(6);
+  otpCache.set(checkemail, otp);  // Overwrite OTP with new one
+  await sendMail(checkemail, 'OTP Verification Code', `<h1>Your OTP verification code is ${otp}</h1>`);
+
+  res.json({ success: true, message: "An OTP has been resent to your email" });
+});
+
+/* ----------------------------- Verify OTP ----------------------------- */
+app.post('/api/user/verifyotp', async (req, res) => {
+  const checkemail = req.body.email;
+  const providedOtp = req.body.verifyotp;
+
+  const storedOtp = otpCache.get(checkemail);
+
+  if (!storedOtp) {
+    return res.json({ success: false, message: "OTP expired or not found" });
+  }
+
+  if (providedOtp === storedOtp) {
+    return res.json({ success: true, message: "OTP Verified successfully" });
+  } else {
+    return res.json({ success: false, message: "The OTP you provided is incorrect" });
+  }
+});
+
+/* ----------------------------- Reset Password ----------------------------- */
+app.post('/api/user/resetpassword', async (req, res) => {
+  const newpassword = req.body.password;
+  const confirmpassword = req.body.confirmpassword;
+  const checkemail = req.body.email;
+
+  if (newpassword !== confirmpassword) {
+    return res.json({ success: false, message: "Passwords do not match!" });
+  }
+
+  try {
+    // Find user by email
+    const [user] = await db.query(`SELECT * FROM users WHERE email = ?`, [checkemail]);
+
+    if (user.length > 0) {
+      // Encrypt the new password (replace with your encryption method)
+      const encryptedPassword = cryptr.encrypt(newpassword);
+      
+      // Update the password in the database
+      await db.query(`UPDATE users SET password = ? WHERE email = ?`, [encryptedPassword, checkemail]);
+
+      res.json({ success: true, message: "Password reset successfully" });
+    } else {
+      res.json({ success: false, message: "User with this email does not exist" });
+    }
+  } catch (error) {
+    console.error('Password reset failed:', error);
+    res.json({ success: false, message: "Failed to reset password" });
+  }
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on http://localhost:3000');
+});
