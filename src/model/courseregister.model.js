@@ -1,38 +1,24 @@
 
+
 const generateTimestamps = require("./timestamp");
 
 let Schema = (Sequelize,mode) => {
 
     return {
 
+        courseregid : {
+            type: Sequelize.STRING,
+            allowNull:false
+        },
+        courseid : {
+            type: Sequelize.STRING,
+            allowNull:false
+        },
         userid : {
             type: Sequelize.STRING,
             allowNull:false
         },
-        firstname : {
-            type: Sequelize.STRING,
-            allowNull:false
-        },
-        lastname : {
-            type: Sequelize.STRING,
-            allowNull:false
-
-        },
-        mobile: {
-            type: Sequelize.STRING,
-            allowNull:false
-
-        },
-        email: {
-            type: Sequelize.STRING,
-            allowNull:false
-
-        },
-        password: {
-            type: Sequelize.STRING,
-            allowNull:false
-
-        },
+              
       
         ...generateTimestamps(Sequelize,mode)
     }
@@ -40,13 +26,13 @@ let Schema = (Sequelize,mode) => {
 
 const Model = (sequelize, instance, Sequelize) => {
     // Define initial for DB sync
-    sequelize.define("auth", Schema(Sequelize,1),{ timestamps: false });
+    sequelize.define("courseregister", Schema(Sequelize,1),{ timestamps: false });
     // Bypass initial instance to cater for timestamps
-    const Auth = instance.define("auth", Schema(Sequelize,2),{ 
+    const Courseregister = instance.define("courseregister", Schema(Sequelize,2),{ 
         timestamps: false,
        
     });
-    return Auth;
+    return Courseregister;
 }
 
 module.exports = { Schema , Model};

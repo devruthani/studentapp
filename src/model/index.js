@@ -35,12 +35,23 @@ DB.sequelize = initialInstance;
 
 //Register Sequelize Models
 const Auth = DB.auth = require("./auth.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
+const Courses = DB.courses = require("./courses.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
+const Tasks = DB.tasks = require("./tasks.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
+const Courseregister = DB.courseregister = require("./courseregister.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
+const Studenttasks = DB.studenttasks = require("./studenttasks.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
+const Group = DB.group = require("./group.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
+
 
 
 
 module.exports = {
     DB,
     Auth,
+    Courses,
+    Tasks,
+    Courseregister,
+    Studenttasks,
+    Group
     
     
 };

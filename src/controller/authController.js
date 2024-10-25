@@ -15,7 +15,7 @@ const emailRegexp =
 var passwordsymbol = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/;
 var numbercheck = /\d/;
 var upperLowercase = /^(?=.*[a-z])(?=.*[A-Z])/;
-// password validation end.
+// password validation end.git 
 
 const authController = {
   async signUp(req, res) {
@@ -32,7 +32,7 @@ const authController = {
       ) {
         if (emailRegexp.test(req.body.email)) {
           const regAdmin = await db.insert("auths", {
-            adminId: adminId,
+            userid: adminId,
             firstname: req.body.firstname,
             lastname: req.body.lastname,
             email: req.body.email,

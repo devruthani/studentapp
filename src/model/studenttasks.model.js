@@ -1,38 +1,31 @@
 
+
+
 const generateTimestamps = require("./timestamp");
 
 let Schema = (Sequelize,mode) => {
 
     return {
 
-        userid : {
+        studenttaskid : {
             type: Sequelize.STRING,
             allowNull:false
         },
-        firstname : {
+        courseid : {
             type: Sequelize.STRING,
             allowNull:false
         },
-        lastname : {
-            type: Sequelize.STRING,
-            allowNull:false
-
-        },
-        mobile: {
+        taskid : {
             type: Sequelize.STRING,
             allowNull:false
 
         },
-        email: {
+        status: {
             type: Sequelize.STRING,
             allowNull:false
 
         },
-        password: {
-            type: Sequelize.STRING,
-            allowNull:false
-
-        },
+      
       
         ...generateTimestamps(Sequelize,mode)
     }
@@ -40,13 +33,13 @@ let Schema = (Sequelize,mode) => {
 
 const Model = (sequelize, instance, Sequelize) => {
     // Define initial for DB sync
-    sequelize.define("auth", Schema(Sequelize,1),{ timestamps: false });
+    sequelize.define("studenttasks", Schema(Sequelize,1),{ timestamps: false });
     // Bypass initial instance to cater for timestamps
-    const Auth = instance.define("auth", Schema(Sequelize,2),{ 
+    const Studenttasks = instance.define("studenttasks", Schema(Sequelize,2),{ 
         timestamps: false,
        
     });
-    return Auth;
+    return Studenttasks;
 }
 
 module.exports = { Schema , Model};

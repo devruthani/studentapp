@@ -5,34 +5,35 @@ let Schema = (Sequelize,mode) => {
 
     return {
 
-        userid : {
+        courseid : {
             type: Sequelize.STRING,
             allowNull:false
         },
-        firstname : {
+        title : {
             type: Sequelize.STRING,
             allowNull:false
         },
-        lastname : {
-            type: Sequelize.STRING,
-            allowNull:false
-
-        },
-        mobile: {
+        description : {
             type: Sequelize.STRING,
             allowNull:false
 
         },
-        email: {
+        outline: {
             type: Sequelize.STRING,
             allowNull:false
 
         },
-        password: {
+        schedule: {
             type: Sequelize.STRING,
             allowNull:false
 
         },
+        price: {
+            type: Sequelize.STRING,
+            allowNull:false
+
+        },
+      
       
         ...generateTimestamps(Sequelize,mode)
     }
@@ -40,13 +41,13 @@ let Schema = (Sequelize,mode) => {
 
 const Model = (sequelize, instance, Sequelize) => {
     // Define initial for DB sync
-    sequelize.define("auth", Schema(Sequelize,1),{ timestamps: false });
+    sequelize.define("courses", Schema(Sequelize,1),{ timestamps: false });
     // Bypass initial instance to cater for timestamps
-    const Auth = instance.define("auth", Schema(Sequelize,2),{ 
+    const Courses = instance.define("courses", Schema(Sequelize,2),{ 
         timestamps: false,
        
     });
-    return Auth;
+    return Courses;
 }
 
 module.exports = { Schema , Model};
