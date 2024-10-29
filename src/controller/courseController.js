@@ -13,7 +13,7 @@ async createCourse(req,res){
     try{
         const courseId = crypto.randomBytes(16).toString("hex");
 
-        const courses = await Courses.create("courses",{
+        const courses = await Courses.create({
             courseid: courseId,
             title:req.body.title,
             description:req.body.description,

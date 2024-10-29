@@ -1,10 +1,8 @@
 const db = require("../../dbconnection/dbconfig");
 const crypto = require("crypto");
-const { encrypt } = require("../utils/encrypt");
-const randomOtp = require("random-otp-generator");
-const { sendMail } = require("../utils/nodemailer");
-const Cache = require("memory-cache");
-const jwt = require("jsonwebtoken");
+const { Group } = require("../model");
+const { Model } = require("../model/group.model");
+
 
 
 const groupController ={
@@ -14,7 +12,7 @@ async createGroups(req,res){
     try{
         const groupId = crypto.randomBytes(16).toString("hex");
 
-        const groups = await db.create("groups",{
+        const groups = await Group.create({
             groupid: groupId,
             groupname:req.body.groupname,
             courseid:req.body.courseid,
@@ -28,7 +26,7 @@ async createGroups(req,res){
             })
             
         }else{
-            return res.status(400).json({
+            return res.status(404).json({
                 error:true,
                 message:"Failed to create group",
                 
@@ -38,9 +36,10 @@ async createGroups(req,res){
 
     }catch(error){
         console.log(error);
-        return  res.status(400).json({
+        return  res.status(500).json({
             error:true,
-            message: "Oops! some thing went wrong"
+            message: "Oops! some thing went wrong",
+            data:error.message
             })
 
     }
@@ -51,26 +50,29 @@ async createGroups(req,res){
 async fetchByid(req,res){
     try {
         
-   
-    const getByid = await db.select("groups",{groupid:req.params.groupid});
-    if(getByid){
+   const {groupid} = req.params
+    const getByid = await Group.findOne({where:{groupid}});
+    if(!getByid){
+        return res.status(404).json({
+            error:true,
+            message:"Failed to acquire group information"
+        });
+       
+
+    }else{
         return res.status(200).json({
             error:false,
             message:"Group information acquired successfully",
             data:getByid
-        })
-
-    }else{
-        return res.status(400).json({
-            error:true,
-            message:"Failed to acquire group information"
-        })
+        });
+       
     }
 } catch (error) {
 console.log(error);
-return  res.status(400).json({
+return  res.status(500).json({
     error:true,
-    message: "Oops! some thing went wrong"
+    message: "Oops! some thing went wrong",
+    data:error.message
     })
         
 }
@@ -78,22 +80,26 @@ return  res.status(400).json({
 
 async editGroup(req,res){
     try{
-        const updateGroup = await db.update("groups",{
-            groupname:req.body.groupname,
-            groupdescription:req.body.groupdescription
-        },{id:req.body.id});
 
+        const {groupid} = req.params;
+        const updateGroup = await Group.findOne({where:{groupid}});
 
-        if(updateGroup){
+        if(!updateGroup){
+            return res.status(404).json({
+                error:true,
+                message:"Group not found"
+            })
+           
+
+        }else{
+            await Group.update({
+                groupname:req.body.groupname,
+                groupdescription:req.body.groupdescription
+
+            })
             return res.status(200).json({
                 error:false,
                 message:"Group information updated successfully"
-            })
-
-        }else{
-            return res.status(400).json({
-                error:true,
-                message:"Fail to update group information"
             })
 
         }
@@ -102,7 +108,8 @@ async editGroup(req,res){
         console.log(error);
     return  res.status(400).json({
     error:true,
-    message: "Oops! some thing went wrong"
+    message: "Error in updating group information",
+    data:error.message
     })
 
     }

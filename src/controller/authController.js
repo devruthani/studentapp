@@ -5,6 +5,10 @@ const randomOtp = require("random-otp-generator");
 const { sendMail } = require("../utils/nodemailer");
 const Cache = require("memory-cache");
 const jwt = require("jsonwebtoken");
+const { Auth } = require("../model");
+const { Model } = require("../model/auth.model");
+
+
 
 require("dotenv").config();
 // email validation
@@ -20,7 +24,7 @@ var upperLowercase = /^(?=.*[a-z])(?=.*[A-Z])/;
 const authController = {
   async signUp(req, res) {
     try {
-      const adminId = crypto.randomBytes(16).toString("hex");
+      const userId = crypto.randomBytes(16).toString("hex");
       const password = encrypt(req.body.password);
 
       if (
@@ -31,115 +35,118 @@ const authController = {
         req.body.password
       ) {
         if (emailRegexp.test(req.body.email)) {
-          const regAdmin = await db.insert("auths", {
-            userid: adminId,
+          const regUser = await Auth.create({
+            userid: userId,
             firstname: req.body.firstname,
             lastname: req.body.lastname,
             email: req.body.email,
             mobile: req.body.mobile,
             password: password,
           });
-          if (regAdmin) {
+          if (regUser) {
             return res.status(200).json({
               error: false,
               message: "You have been registered successfully",
             });
           } else {
-            return res.status(400).json({
+            return res.status(404).json({
               error: true,
               message: "Registration failed",
             });
           }
         } else {
-          return res.status(400).json({
+          return res.status(404).json({
             error: true,
             message: "Email should be provided in the right format",
           });
         }
       } else {
-        return res.status(400).json({
+        return res.status(404).json({
           error: true,
           message: "All fields are required",
         });
       }
     } catch (error) {
       console.log(error);
-      // return res.status(400).json({
-      //   error: true,
-      //   message: "Oops! some thing went wrong",
-      // });
-    }
-  },
-
-  //    admin login
-  async login(req, res) {
-    try {
-      var regemail = req.body.email;
-      var securedpassward = encrypt(req.body.password);
-      const loginAdmin = await db.select("auths", {
-        email: regemail,
-        password: securedpassward,
-      });
-
-      if (loginAdmin.length > 0) {
-        return res.status(200).json({
-          error: false,
-          message: "You've been logged in successfully",
-          data: loginAdmin,
-        });
-      } else {
-        return res.status(400).json({
-          error: true,
-          message: "Invalid credentials",
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      return res.status(400).json({
+      return res.status(500).json({
         error: true,
         message: "Oops! some thing went wrong",
       });
     }
   },
 
-  // forgot password
 
-  // async forgetPassword(req, res) {
+  /* ---------------------------- //    admin login --------------------------- */
+  // async login(req, res) {
   //   try {
-  //       // check if email was sent
-  //       var checkEmail = req.body.email;
-  //       if(checkEmail == undefined){
-  //         return res.status(400).json({
-  //           error: true,
-  //           message: "No email was sent",
-  //         });
+  //     var regemail = req.body.email;
+  //     var securedpassward = encrypt(req.body.password);
+  //     const loginUser = await Auth.findOne({
+  //       email: regemail,
+  //       password: securedpassward,
+  //     });
 
-  //       }else{
-  //         const otp = randomOtp(6);
-
-  //         Cache.put(checkEmail,otp)
-  //         sendMail(checkEmail, 'OTP Verification Code', `<h1>Your OTP verification code is ${otp} </h1>`)
-
-  //         return res.status(200).json({
-  //           error:false,
-  //           message: "An OTP has been sent to your email"
-  //         })
-  //       }
-
+  //     if (loginUser.length > 0) {
+  //       return res.status(200).json({
+  //         error: false,
+  //         message: "You've been logged in successfully",
+  //         data: loginUser,
+  //       });
+  //     } else {
+  //       return res.status(404).json({
+  //         error: true,
+  //         message: "Invalid credentials",
+  //       });
+  //     }
   //   } catch (error) {
   //     console.log(error);
-  //     return res.status(400).json({
+  //     return res.status(500).json({
   //       error: true,
   //       message: "Oops! some thing went wrong",
+  //       data:error.message
   //     });
   //   }
   // },
+
+  // forgot password
+
+  async login(req, res) {
+    try {
+        var regemail = req.body.email;
+        var securedPassword = encrypt(req.body.password);
+        const loginUser = await Auth.findOne({where:{
+            email: regemail,
+            password: securedPassword,
+        }});
+
+        if (loginUser) {
+            return res.status(200).json({
+                error: false,
+                message: "You've been logged in successfully",
+                data: loginUser,
+            });
+        } else {
+            return res.status(404).json({
+                error: true,
+                message: "Invalid credentials",
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            error: true,
+            message: "Oops! Something went wrong",
+            data: error.message
+        });
+    }
+},
+
   async forgetPassword(req, res) {
     try {
       // check if email was sent
       const checkEmail = req.body.email;
       if (!checkEmail) {
-        return res.status(400).json({
+        return res.status(404).json({
           error: true,
           message: "No email was sent",
         });
@@ -149,7 +156,7 @@ const authController = {
         const token = jwt.sign(
           { otp, email: checkEmail },
           process.env.JWT_SECRET_KEY,
-          { expiresIn: "5m" }
+          { expiresIn: "10m" }
         );
 
         // Send the token in the email (user will use this token in the verification process)
@@ -167,9 +174,10 @@ const authController = {
       }
     } catch (error) {
       console.log(error);
-      return res.status(400).json({
+      return res.status(500).json({
         error: true,
         message: "Oops! some thing went wrong",
+        data:error.message
       });
     }
   },
@@ -180,7 +188,7 @@ const authController = {
     try {
       const checkEmail = req.body.email;
       if (!checkEmail) {
-        res.status(400).json({
+        res.status(404).json({
           error: true,
           message: "No email was provided",
         });
@@ -189,7 +197,7 @@ const authController = {
         const token = jwt.sign(
           { otp, email: checkEmail },
           process.env.JWT_SECRET_KEY,
-          { expiresIn: "5m" }
+          { expiresIn: "10m" }
         );
 
         // send the new token and otp via email
@@ -207,9 +215,10 @@ const authController = {
       }
     } catch (error) {
       console.log(error);
-      return res.status(400).json({
+      return res.status(500).json({
         error: true,
         message: "Oops! some thing went wrong, failed to resend otp",
+        data:error.message
       });
     }
   },
@@ -237,7 +246,7 @@ async verifyOTP(req, res) {
         message: "OTP verified successfully",
       });
     } else {
-      return res.status(400).json({
+      return res.status(404).json({
         error: true,
         message: "The OTP you provided is incorrect",
       });
@@ -245,12 +254,12 @@ async verifyOTP(req, res) {
 
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      return res.status(400).json({
+      return res.status(500).json({
         error: true,
         message: "The OTP has expired",
       });
     } else {
-      return res.status(400).json({
+      return res.status(500).json({
         error: true,
         message: "Invalid Token",
       });
@@ -268,27 +277,27 @@ async verifyOTP(req, res) {
   
       // Check if the new password matches the confirmed password
       if (newpassword !== confirmpassword) {
-        return res.status(400).json({
+        return res.status(404).json({
           error: true,
           message: "Passwords do not match"
         });
       } else {
         // Find user by email
-        const theUser = await db.select("auths", { email: checkemail });
+        const theUser = await Auth.findOne({where:{ email: checkemail }});
   
         if (theUser.length > 0) {
           // Encrypt the new password (replace with your encryption method)
           const encryptedPassword = encrypt(newpassword);
   
           // Update the user's password in the "auths" table
-          await db.update("auths", { password: encryptedPassword }, { email: checkemail });
+          await Auth.update({ password: encryptedPassword }, { email: checkemail });
   
           return res.status(200).json({
             error: false,
             message: "Password reset successfully"
           });
         } else {
-          return res.status(400).json({
+          return res.status(404).json({
             error: true,
             message: "User with this email does not exist"
           });
@@ -296,9 +305,10 @@ async verifyOTP(req, res) {
       }
     } catch (error) {
       console.error('Password reset failed', error);
-      return res.status(400).json({
+      return res.status(404).json({
         error: true,
-        message: "Failed to reset password"
+        message: "Failed to reset password",
+        data:error.message
       });
     }
   },
@@ -309,8 +319,9 @@ async verifyOTP(req, res) {
   
 async getUserbyid(req,res){
   try{
-    const userProfile = await db.select("auths",{userid:req.params.userid});
-    console.log(userProfile)
+    const {userid} = req.params
+    const userProfile = await Auth.findOne({where:{userid}});
+    
 
     if(userProfile){
       return res.status(200).json({
@@ -321,7 +332,7 @@ async getUserbyid(req,res){
      
      
     }else{
-      return res.status(400).json({
+      return res.status(404).json({
         error:true,
         message:"Failed to acquire user information",
         
@@ -329,14 +340,60 @@ async getUserbyid(req,res){
     }
 
   }catch(error){
-    console.log(error).toString();
+    console.log(error)
     return res.status(400).json({
       error:false,
       message:"Something went wrong"
     })
 
   }
-}
+},
+
+
+/* ------------------------- UPDATE USER INFORMATION ------------------------ */
+async editUser(req,res){
+  try{
+
+      const {userid} = req.params;
+      const editUser = await Auth.findOne({where:{userid:userid}});
+
+      if(!editUser){
+          return res.status(404).json({
+              error:true,
+              message:"User with this id not found"
+          })
+         
+
+      }else{
+          await Auth.update({
+              firstname:req.body.firstname,
+              lastname:req.body.lastname,
+              mobile:req.body.mobile,
+              state:req.body.state,
+              country:req.body.country,
+              address:req.body.address,
+              gender:req.body.gender,
+              email:req.body.email
+
+          },{where:{userid:req.params.userid}})
+          return res.status(200).json({
+              error:false,
+              message:"User information updated successfully"
+          })
+
+      }
+
+  }catch(error){
+      console.log(error);
+  return  res.status(400).json({
+  error:true,
+  message: "Error in updating user information",
+  data:error.message
+  })
+
+  }
+},
+
 
 
 

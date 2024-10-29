@@ -42,4 +42,4 @@ const Model = (sequelize, instance, Sequelize) => {
     return Announcement;
 }
 
-module.exports = { Schema , Model};
+module.exports = { Schema, Model};

@@ -33,6 +33,26 @@ let Schema = (Sequelize,mode) => {
             allowNull:false
 
         },
+        gender: {
+            type: Sequelize.STRING,
+            allowNull:true
+
+        },
+        state: {
+            type: Sequelize.STRING,
+            allowNull:true
+
+        },
+        country: {
+            type: Sequelize.STRING,
+            allowNull:true
+
+        },
+        address: {
+            type: Sequelize.STRING,
+            allowNull:true
+
+        },
       
         ...generateTimestamps(Sequelize,mode)
     }

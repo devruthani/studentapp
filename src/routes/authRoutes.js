@@ -13,6 +13,7 @@ router.post("/api/auth/resetpassword",authController.resetPassword);
 
 /* --------------------------- user profile route --------------------------- */
 router.get("/api/user/getbyid/:userid",authController.getUserbyid);
+router.post("/api/user/edit/:userid",authController.editUser);
 
 
 module.exports = router;

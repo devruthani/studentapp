@@ -36,6 +36,7 @@ const courseRoutes = require("./src/routes/courseRoutes")
 const groupRoutes = require("./src/routes/groupRoutes")
 const tasksRoutes = require("./src/routes/tasksRoutes")
 const studentTaskRoutes = require("./src/routes/studentstaskRoutes");
+const courseRegisterRoutes = require("./src/routes/courseRegisterRoutes");
 
 
 app.use(authRoutes);
@@ -43,6 +44,7 @@ app.use(tasksRoutes)
 app.use(studentTaskRoutes);
 app.use(groupRoutes);
 app.use(courseRoutes);
+app.use(courseRegisterRoutes);
 
 
 
