@@ -36,6 +36,7 @@ const courseRoutes = require("./src/routes/courseRoutes")
 const groupRoutes = require("./src/routes/groupRoutes")
 const tasksRoutes = require("./src/routes/tasksRoutes")
 const studentTaskRoutes = require("./src/routes/studentstaskRoutes");
+const announcementRoutes = require("./src/routes/announcementRoutes");
 const courseRegisterRoutes = require("./src/routes/courseRegisterRoutes");
 
 
