@@ -14,7 +14,7 @@ let Schema = (Sequelize,mode) => {
             type: Sequelize.STRING,
             allowNull:false
         },
-    announcement_description : {
+    announcement_description: {
             type: Sequelize.STRING,
             allowNull:false
 

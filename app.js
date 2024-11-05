@@ -46,6 +46,7 @@ app.use(studentTaskRoutes);
 app.use(groupRoutes);
 app.use(courseRoutes);
 app.use(courseRegisterRoutes);
+app.use(announcementRoutes);
 
 
 

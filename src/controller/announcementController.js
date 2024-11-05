@@ -1,11 +1,14 @@
 const { Announcement } = require("../model");
 const { Model } = require("../model/announcement.model"); // Assuming the model is located in models directory
+const crypto = require("crypto");
 
 // Create a new announcement
 exports.createAnnouncement = async (req, res) => {
     try {
-        const { announcementid, announcement_title, announcement_description, calltoaction } = req.body;
-        const announcement = await Announcement.create({ announcementid, announcement_title, announcement_description, calltoaction });
+
+        const annountId = crypto.randomBytes(16).toString("hex");
+        const {announcement_title, announcement_description, calltoaction } = req.body;
+        const announcement = await Announcement.create({ announcementid : annountId, announcement_title, announcement_description, calltoaction });
         res.status(201).json({error:false, message: "Announcement created successfully", data: announcement });
     } catch (error) {
         res.status(500).json({ message: "Error creating announcement", data: error.message , error:true});
