@@ -33,6 +33,8 @@ DB.Sequelize = Sequelize;
 DB.sequelize = initialInstance;
 
 
+
+
 //Register Sequelize Models
 const Auth = DB.auth = require("./auth.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
 const Courses = DB.courses = require("./courses.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
@@ -41,10 +43,22 @@ const Courseregister = DB.courseregister = require("./courseregister.model.js").
 const Studenttasks = DB.studenttasks = require("./studenttasks.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
 const Group = DB.group = require("./group.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
 const Announcement = DB.announcement = require("./announcement.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
+const Coursecontent = DB.coursecontent = require("./coursecontent.model.js").Model(initialInstance, createSequelizeInstance(), Sequelize);
 
 
 
+/* --------------------------- table relationships -------------------------- */
+Courses.hasMany(Coursecontent,{
+    foreignKey: "courseid",
+    as: "coursecontent"
+});
 
+Coursecontent.belongsTo(Courses,{
+    foreignKey: "courseid",
+    as: "course"
+})
+
+/* ------------------------------ export tables ----------------------------- */
 module.exports = {
     DB,
     Auth,
@@ -53,7 +67,8 @@ module.exports = {
     Courseregister,
     Studenttasks,
     Group,
-    Announcement
+    Announcement,
+    Coursecontent
     
     
 };

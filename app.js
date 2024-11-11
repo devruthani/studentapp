@@ -10,7 +10,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 // sequelize connection 
-const { DB } = require("./src/model");
+const { DB, Coursecontent } = require("./src/model");
 
   DB.sequelize.sync({
     force:false
@@ -38,7 +38,7 @@ const tasksRoutes = require("./src/routes/tasksRoutes")
 const studentTaskRoutes = require("./src/routes/studentstaskRoutes");
 const announcementRoutes = require("./src/routes/announcementRoutes");
 const courseRegisterRoutes = require("./src/routes/courseRegisterRoutes");
-
+ const coursecontentRoutes = require("./src/routes/coursecontentRoutes")
 
 app.use(authRoutes);
 app.use(tasksRoutes)
@@ -47,6 +47,7 @@ app.use(groupRoutes);
 app.use(courseRoutes);
 app.use(courseRegisterRoutes);
 app.use(announcementRoutes);
+app.use(coursecontentRoutes);
 
 
 

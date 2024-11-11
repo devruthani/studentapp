@@ -1,41 +1,47 @@
 
+
 const generateTimestamps = require("./timestamp");
 
 let Schema = (Sequelize,mode) => {
 
     return {
+        
 
+        contentid : {
+            type: Sequelize.STRING,
+            allowNull:false
+        },
         courseid : {
             type: Sequelize.STRING,
             allowNull:false
         },
-        title : {
+        topic : {
             type: Sequelize.STRING,
             allowNull:false
         },
-        description : {
-            type: Sequelize.STRING,
-            allowNull:false
-
-        },
-        outline: {
-            type: Sequelize.STRING,
-            allowNull:false
-
-        },
-        schedule: {
-            type: Sequelize.STRING,
-            allowNull:false
-
-        },
-        price: {
+        topicsummary : {
             type: Sequelize.STRING,
             allowNull:false
 
         },
         thumnail: {
             type: Sequelize.STRING,
-            allowNull:false
+            allowNull:true
+
+        },
+        video: {
+            type: Sequelize.STRING,
+            allowNull:true
+
+        },
+        notes: {
+            type: Sequelize.STRING,
+            allowNull:true
+
+        },
+        refference: {
+            type: Sequelize.STRING,
+            allowNull:true
 
         },
       
@@ -46,13 +52,13 @@ let Schema = (Sequelize,mode) => {
 
 const Model = (sequelize, instance, Sequelize) => {
     // Define initial for DB sync
-    sequelize.define("courses", Schema(Sequelize,1),{ timestamps: false });
+    sequelize.define("coursecontent", Schema(Sequelize,1),{ timestamps: false });
     // Bypass initial instance to cater for timestamps
-    const Courses = instance.define("courses", Schema(Sequelize,2),{ 
+    const Coursecontent = instance.define("coursecontent", Schema(Sequelize,2),{ 
         timestamps: false,
        
     });
-    return Courses;
+    return Coursecontent;
 }
 
 module.exports = { Schema , Model};
